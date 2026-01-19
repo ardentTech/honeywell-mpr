@@ -40,3 +40,17 @@ path = "src/bin/i2c_async_raw_data_with_delay.rs"
 test = false
 doctest = false
 bench = false
+
+[[bin]]
+name = "i2c_async_read"
+path = "src/bin/i2c_async_read.rs"
+test = false
+doctest = false
+bench = false
+
+[[bin]]
+name = "i2c_async_read_with_delay"
+path = "src/bin/i2c_async_read_with_delay.rs"
+test = false
+doctest = false
+bench = false
