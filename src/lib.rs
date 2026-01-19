@@ -1,9 +1,10 @@
 #![no_std]
 #![allow(async_fn_in_trait)]
 
+use embedded_hal_async::delay::DelayNs;
 use embedded_hal_async::i2c::I2c;
 use crate::registers::Status;
-use crate::typedefs::TransferFunction;
+use crate::typedefs::{Reading, TransferFunction};
 
 mod registers;
 pub mod typedefs;
@@ -31,13 +32,19 @@ impl MprConfig {
 
 #[derive(Debug)]
 pub enum MprError {
-    I2c,
+    I2c, // TODO wrap
     InvalidAddress,
-    Nop
+    IntegrityTest,
+    MathSaturation,
+    Spi, // TODO wrap
+}
+
+mod private {
+    pub trait Sealed {}
 }
 
 // TODO seal this
-pub trait Interface {
+pub trait Interface: private::Sealed {
     async fn read_reg(&mut self, buf: &mut [u8]) -> Result<(), MprError>;
     async fn write_reg(&mut self, buf: &[u8]) -> Result<(), MprError>;
 }
@@ -49,10 +56,11 @@ pub struct I2cInterface<I2C> {
 }
 
 impl<I2C: I2c> I2cInterface<I2C> {
-    pub fn new(device: I2C, address: u8) -> Self {
+    pub(crate) fn new(device: I2C, address: u8) -> Self {
         Self { device, address }
     }
 }
+impl<I2C: I2c>private::Sealed for I2cInterface<I2C> {}
 
 impl<I2C: I2c>Interface for I2cInterface<I2C> {
     async fn read_reg(&mut self, buf: &mut [u8]) -> Result<(), MprError> {
@@ -84,9 +92,66 @@ impl <I2C: I2c> Mpr<I2cInterface<I2C>> {
 // TODO spi
 
 impl <I: Interface>Mpr<I> {
+
+    /// Exits sensor standby mode and enters operating mode in preparation for measurement.
+    ///
+    /// App should delay >=5ms or wait for rising edge on EOC line after this returns and before
+    /// reading measurement data via any `read_raw*` method.
+    pub async fn exit_standby(&mut self) -> Result<(), MprError> {
+        self.interface.write_reg(&OUTPUT_MEASUREMENT_CMD).await
+        // TODO should this return Status (first byte?) MISO on SPI, but a dedicated read on I2C...
+    }
+
+    /// Reads the sensor status byte.
     pub async fn status(&mut self) -> Result<Status, MprError> {
         let mut buf = [0u8; 1];
         self.interface.read_reg(&mut buf).await?;
         Ok(Status::from_bits(buf[0]))
+    }
+
+    /// Reads 24-bits of raw pressure data.
+    pub async fn read_raw(&mut self) -> Result<u32, MprError> {
+        let mut buf = [0u8; 4];
+        self.interface.read_reg(&mut buf).await?;
+
+        let status = Status::from_bits(buf[0]);
+        if status.math_saturation_occurred() {
+            return Err(MprError::MathSaturation)
+        }
+        if !status.integrity_test_passed() {
+            return Err(MprError::IntegrityTest)
+        }
+        Ok(((buf[1] as u32) << 16) + ((buf[2] as u32) << 8) + buf[3] as u32)
+    }
+
+    /// Exits standby, waits and then reads raw pressure data.
+    pub async fn read_raw_with_delay<D: DelayNs>(&mut self, mut delay: D) -> Result<u32, MprError> {
+        self.exit_standby().await?;
+        delay.delay_ms(EXIT_STANDBY_DELAY_MS).await;
+        self.read_raw().await
+    }
+
+    /// Reads 24-bits of raw pressure data as a Reading.
+    pub async fn read(&mut self) -> Result<Reading, MprError> {
+        let raw_data = self.read_raw().await?;
+        Ok(Reading {
+            range_min: self.config.pressure_min as f32,
+            range_max: self.config.pressure_max as f32,
+            raw_data,
+            transfer_function: self.config.transfer_function
+        })
+    }
+
+    /// Exits standby, waits and then reads raw pressure data as a Reading.
+    pub async fn read_with_delay<D: DelayNs>(&mut self, mut delay: D) -> Result<Reading, MprError> {
+        self.exit_standby().await?;
+        delay.delay_ms(EXIT_STANDBY_DELAY_MS).await;
+        let raw_data = self.read_raw().await?;
+        Ok(Reading {
+            range_min: self.config.pressure_min as f32,
+            range_max: self.config.pressure_max as f32,
+            raw_data,
+            transfer_function: self.config.transfer_function
+        })
     }
 }

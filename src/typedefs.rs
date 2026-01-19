@@ -1,6 +1,7 @@
 const KPA_IN_PSI: f32 = 6.894757;
 const PSI_IN_BAR: f32 = 14.50377;
 
+/// Wraps raw measurement data for easy unit conversions.
 pub struct Reading {
     pub(crate) range_min: f32,
     pub(crate) range_max: f32,
@@ -12,15 +13,17 @@ impl Reading {
         Self { range_min, range_max, raw_data, transfer_function }
     }
 
+    /// Converts raw measurement data to bar.
     pub fn bar(&self) -> f32 {
         self.psi() / PSI_IN_BAR
     }
 
+    /// Converts raw measurement data to kPa.
     pub fn kpa(&self) -> f32 {
         self.psi() * KPA_IN_PSI
     }
 
-    // see datasheet section 8.0
+    /// Converts raw measurement data to PSI.
     pub fn psi(&self) -> f32 {
         ((self.raw_data as f32 - self.transfer_function.min_counts()) * (self.range_max - self.range_min)) /
             (self.transfer_function.max_counts() - self.transfer_function.min_counts()) + self.range_min
@@ -28,11 +31,18 @@ impl Reading {
 }
 
 #[derive(Clone, Copy)]
-pub enum TransferFunction { A, B, C }
+pub enum TransferFunction {
+    /// 10% to 90% of 2**24 counts
+    A,
+    /// 2.5% to 22.5% of 2**24 counts
+    B,
+    /// 20% to 80% of 2**24 counts
+    C
+}
 impl TransferFunction {
     pub fn min_counts(&self) -> f32 {
         match self {
-            // precomputed percentages of 2**24
+            // precomputed percentages
             TransferFunction::A => 1677721.6,
             TransferFunction::B => 419430.4,
             TransferFunction::C => 3355443.3,
@@ -40,7 +50,7 @@ impl TransferFunction {
     }
     pub fn max_counts(&self) -> f32 {
         match self {
-            // precomputed percentages of 2**24
+            // precomputed percentages
             TransferFunction::A => 15099494.0,
             TransferFunction::B => 3774873.5,
             TransferFunction::C => 13421773.0,

@@ -24,3 +24,19 @@ debug = true
 name = "i2c_async_status"
 path = "src/bin/i2c_async_status.rs"
 test = false
+doctest = false
+bench = false
+
+[[bin]]
+name = "i2c_async_raw_data"
+path = "src/bin/i2c_async_raw_data.rs"
+test = false
+doctest = false
+bench = false
+
+[[bin]]
+name = "i2c_async_raw_data_with_delay"
+path = "src/bin/i2c_async_raw_data_with_delay.rs"
+test = false
+doctest = false
+bench = false

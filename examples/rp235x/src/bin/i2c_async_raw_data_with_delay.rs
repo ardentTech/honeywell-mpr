@@ -1,0 +1,38 @@
+//! This example shows how to read raw data using Embassy. Unlike the `i2c_async_raw_data` example,
+//! standby does not need to be exited manually and the wait is handled by the driver.
+
+#![no_std]
+#![no_main]
+
+use defmt::*;
+use embassy_rp::i2c::InterruptHandler;
+use embassy_time::Delay;
+use {defmt_rtt as _, panic_probe as _};
+use honeywell_mpr::{Mpr, MprConfig};
+use honeywell_mpr::typedefs::TransferFunction;
+
+embassy_rp::bind_interrupts!(struct Irqs {
+    I2C1_IRQ => InterruptHandler<embassy_rp::peripherals::I2C1>;
+});
+
+#[embassy_executor::main]
+async fn main(_task_spawner: embassy_executor::Spawner) {
+    let p = embassy_rp::init(Default::default());
+    let sda = p.PIN_14;
+    let scl = p.PIN_15;
+    let mut config = embassy_rp::i2c::Config::default();
+    config.frequency = 400_000;
+    let bus = embassy_rp::i2c::I2c::new_async(p.I2C1, scl, sda, Irqs, config);
+
+    embassy_time::Timer::after(embassy_time::Duration::from_millis(100)).await;
+    let config = MprConfig::new(0, 25, TransferFunction::C);
+    let mut sensor = Mpr::new_i2c(bus, 0x18, config).unwrap();
+
+    loop {
+        match sensor.read_raw_with_delay(Delay).await {
+            Ok(raw_data) => info!("raw data: {}", raw_data),
+            Err(_) => error!("read_raw_with_delay failed :(")
+        }
+        embassy_time::Timer::after(embassy_time::Duration::from_millis(3_000)).await;
+    }
+}
