@@ -1,5 +1,7 @@
-const KPA_IN_PSI: f32 = 6.894757;
-const PSI_IN_BAR: f32 = 14.50377;
+const KPA_PER_PSI: f32 = 6.894757;
+const INHG_PER_PSI: f32 = 2.03602;
+const MMHG_PER_PSI: f32 = 51.71492;
+const PSI_PER_BAR: f32 = 14.50377;
 
 /// Wraps raw measurement data for easy unit conversions.
 pub struct Reading {
@@ -15,12 +17,18 @@ impl Reading {
 
     /// Converts raw measurement data to bar.
     pub fn bar(&self) -> f32 {
-        self.psi() / PSI_IN_BAR
+        self.psi() / PSI_PER_BAR
     }
+
+    /// Converts raw measurement data to inHg.
+    pub fn inhg(&self) -> f32 { self.psi() * INHG_PER_PSI }
+
+    /// Converts raw measurement data to mmHg.
+    pub fn mmhg(&self) -> f32 { self.psi() * MMHG_PER_PSI }
 
     /// Converts raw measurement data to kPa.
     pub fn kpa(&self) -> f32 {
-        self.psi() * KPA_IN_PSI
+        self.psi() * KPA_PER_PSI
     }
 
     /// Converts raw measurement data to PSI.
@@ -67,6 +75,18 @@ mod tests {
     fn reading_bar_ok() {
         let reading = Reading::new(-1.0, 1.0, 14260634, TransferFunction::A);
         let _ = relative_eq!(reading.bar(), 0.0603, epsilon = f32::EPSILON);
+    }
+
+    #[test]
+    fn reading_inhg_ok() {
+        let reading = Reading::new(-1.0, 1.0, 14260634, TransferFunction::A);
+        let _ = relative_eq!(reading.inhg(), 1.78151, epsilon = f32::EPSILON);
+    }
+
+    #[test]
+    fn reading_mmhg_ok() {
+        let reading = Reading::new(-1.0, 1.0, 14260634, TransferFunction::A);
+        let _ = relative_eq!(reading.mmhg(), 45.25056, epsilon = f32::EPSILON);
     }
 
     #[test]
