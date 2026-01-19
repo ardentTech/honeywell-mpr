@@ -1,0 +1,19 @@
+[package]
+name = "honeywell_mpr"
+version = "0.1.0"
+edition = "2024"
+authors = ["Jonathan D. Baker <jonathan@ardent.tech>"]
+description = "A no-std driver for the Honeywell MPR sensor."
+keywords = ["embedded", "embedded-hal-driver", "pressure"]
+categories = ["embedded", "no-std"]
+repository = "https://github.com/ardentTech/honeywell-mpr"
+license = "MIT OR Apache-2.0"
+exclude = ["CHANGELOG.md", "examples/*"]
+readme = "README.md"
+
+[dependencies]
+bitfields = "1.0.2"
+embedded-hal-async = "1.0.0"
+
+[dev-dependencies]
+approx = "0.5.1"
