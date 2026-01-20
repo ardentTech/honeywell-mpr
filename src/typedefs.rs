@@ -3,6 +3,7 @@ const INHG_PER_PSI: f32 = 2.03602;
 const MMHG_PER_PSI: f32 = 51.71492;
 const PSI_PER_BAR: f32 = 14.50377;
 
+#[derive(Debug)]
 pub struct MprConfig {
     pub(crate) pressure_min: u8,
     pub(crate) pressure_max: u8,
@@ -16,15 +17,6 @@ impl MprConfig {
     ) -> Self {
         Self { pressure_min, pressure_max, transfer_function }
     }
-}
-
-#[derive(Debug)]
-pub enum MprError {
-    I2c, // TODO wrap
-    InvalidAddress,
-    IntegrityTest,
-    MathSaturation,
-    Spi, // TODO wrap
 }
 
 /// Wraps raw measurement data for easy unit conversions.
@@ -62,7 +54,7 @@ impl Reading {
     }
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub enum TransferFunction {
     /// 10% to 90% of 2**24 counts
     A,

@@ -6,8 +6,7 @@
 use defmt::*;
 use embassy_rp::i2c::InterruptHandler;
 use {defmt_rtt as _, panic_probe as _};
-use honeywell_mpr::{Mpr, MprConfig};
-use honeywell_mpr::typedefs::TransferFunction;
+use honeywell_mpr::{Mpr, MprConfig, TransferFunction};
 
 embassy_rp::bind_interrupts!(struct Irqs {
     I2C1_IRQ => InterruptHandler<embassy_rp::peripherals::I2C1>;

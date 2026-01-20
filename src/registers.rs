@@ -1,5 +1,6 @@
 use bitfields::bitfield;
 
+/// MPR sensor status byte.
 #[bitfield(u8)]
 pub struct Status {
     // LSB first

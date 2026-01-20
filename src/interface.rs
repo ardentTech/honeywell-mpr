@@ -1,14 +1,31 @@
 use embedded_hal_async::i2c::I2c;
 use embedded_hal_async::spi::SpiDevice;
-use crate::typedefs::MprError;
+use crate::registers::Status;
+
+#[derive(Debug)]
+pub enum MprI2cError<E> {
+    I2c(E),
+    InvalidAddress,
+    IntegrityTest,
+    MathSaturation,
+}
+
+#[derive(Debug)]
+pub enum MprSpiError<E> {
+    IntegrityTest,
+    MathSaturation,
+    Spi(E),
+}
 
 mod private {
     pub trait Sealed {}
 }
 
 pub trait Interface: private::Sealed {
-    async fn read_reg(&mut self, buf: &mut [u8]) -> Result<(), MprError>;
-    async fn write_reg(&mut self, buf: &[u8]) -> Result<(), MprError>;
+    type Error;
+    async fn read_reg(&mut self, buf: &mut [u8]) -> Result<(), Self::Error>;
+    async fn write_reg(&mut self, buf: &[u8]) -> Result<(), Self::Error>;
+    fn validate_status(&self, status: Status) -> Result<(), Self::Error>;
 }
 
 // I2C ---------------------------------------------------------------------------------------------
@@ -24,14 +41,24 @@ impl<I2C: I2c> I2cInterface<I2C> {
     }
 }
 impl<I2C: I2c>private::Sealed for I2cInterface<I2C> {}
-
 impl<I2C: I2c>Interface for I2cInterface<I2C> {
-    async fn read_reg(&mut self, buf: &mut [u8]) -> Result<(), MprError> {
-        self.device.read(self.address, buf).await.map_err(|_| MprError::I2c)
+    type Error = MprI2cError<I2C::Error>;
+    async fn read_reg(&mut self, buf: &mut [u8]) -> Result<(), MprI2cError<I2C::Error>> {
+        self.device.read(self.address, buf).await.map_err(MprI2cError::I2c)
     }
 
-    async fn write_reg(&mut self, buf: &[u8]) -> Result<(), MprError> {
-        self.device.write(self.address, buf).await.map_err(|_|  MprError::I2c)
+    async fn write_reg(&mut self, buf: &[u8]) -> Result<(), MprI2cError<I2C::Error>> {
+        self.device.write(self.address, buf).await.map_err(MprI2cError::I2c)
+    }
+
+    fn validate_status(&self, status: Status) -> Result<(), MprI2cError<I2C::Error>> {
+        if status.math_saturation_occurred() {
+            return Err(MprI2cError::MathSaturation)
+        }
+        if !status.integrity_test_passed() {
+            return Err(MprI2cError::IntegrityTest)
+        }
+        Ok(())
     }
 }
 
@@ -47,11 +74,22 @@ impl<SPI: SpiDevice> SpiInterface<SPI> {
 }
 impl<SPI: SpiDevice>private::Sealed for SpiInterface<SPI> {}
 impl<SPI: SpiDevice>Interface for SpiInterface<SPI> {
-    async fn read_reg(&mut self, buf: &mut [u8]) -> Result<(), MprError> {
-        self.device.read(buf).await.map_err(|_| MprError::I2c)
+    type Error = MprSpiError<SPI::Error>;
+    async fn read_reg(&mut self, buf: &mut [u8]) -> Result<(), MprSpiError<SPI::Error>> {
+        self.device.read(buf).await.map_err(MprSpiError::Spi)
     }
 
-    async fn write_reg(&mut self, buf: &[u8]) -> Result<(), MprError> {
-        self.device.write(buf).await.map_err(|_|  MprError::I2c)
+    async fn write_reg(&mut self, buf: &[u8]) -> Result<(), MprSpiError<SPI::Error>> {
+        self.device.write(buf).await.map_err(MprSpiError::Spi)
+    }
+
+    fn validate_status(&self, status: Status) -> Result<(), MprSpiError<SPI::Error>> {
+        if status.math_saturation_occurred() {
+            return Err(MprSpiError::MathSaturation)
+        }
+        if !status.integrity_test_passed() {
+            return Err(MprSpiError::IntegrityTest)
+        }
+        Ok(())
     }
 }
