@@ -85,9 +85,9 @@ fn main() -> ! {
     let mut sensor = Mpr::new_i2c(bus, 0x18, config).unwrap();
 
     loop {
-        match sensor.status() {
-            Ok(status) => info!("status: {:#x}", status.into_bits()),
-            Err(_) => error!("status failed :(")
+        match sensor.read_raw_with_delay(timer) {
+            Ok(raw_data) => info!("raw data: {}", raw_data),
+            Err(_) => error!("read_raw_with_delay failed :(")
         }
         timer.delay_ms(3_000);
     }

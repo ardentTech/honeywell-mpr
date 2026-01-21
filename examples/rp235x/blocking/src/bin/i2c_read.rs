@@ -85,9 +85,20 @@ fn main() -> ! {
     let mut sensor = Mpr::new_i2c(bus, 0x18, config).unwrap();
 
     loop {
-        match sensor.status() {
-            Ok(status) => info!("status: {:#x}", status.into_bits()),
-            Err(_) => error!("status failed :(")
+        sensor.exit_standby().unwrap();
+        timer.delay_ms(10);
+        match sensor.read() {
+            Ok(reading) => {
+                info!(
+                    "bar: {}, inHg: {}, mmHg: {}, kPa: {}, psi: {}",
+                    reading.bar(),
+                    reading.inhg(),
+                    reading.mmhg(),
+                    reading.kpa(),
+                    reading.psi()
+                );
+            },
+            Err(_) => error!("read failed :(")
         }
         timer.delay_ms(3_000);
     }

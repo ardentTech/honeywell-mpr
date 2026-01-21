@@ -352,16 +352,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a513e167849a384b7f9b746e517604398518590a9142f4846a32e3c2a4de7b11"
 
 [[package]]
-name = "panic-probe"
-version = "1.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fd402d00b0fb94c5aee000029204a46884b1262e0c443f166d86d2c0747e1a1a"
-dependencies = [
- "cortex-m",
- "defmt 1.0.1",
-]
-
-[[package]]
 name = "paste"
 version = "1.0.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -540,15 +530,11 @@ dependencies = [
 name = "rp235x_blocking"
 version = "0.1.0"
 dependencies = [
- "cortex-m",
- "cortex-m-rt",
- "critical-section",
  "defmt 1.0.1",
  "defmt-rtt",
  "embedded-hal 1.0.0",
  "honeywell_mpr",
  "panic-halt",
- "panic-probe",
  "rp235x-hal",
 ]
 
