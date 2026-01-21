@@ -1,6 +1,18 @@
+#[cfg(not(feature = "sync"))]
 use embedded_hal_async::delay::DelayNs;
+#[cfg(not(feature = "sync"))]
 use embedded_hal_async::i2c::I2c;
+#[cfg(not(feature = "sync"))]
 use embedded_hal_async::spi::SpiDevice;
+
+
+#[cfg(feature = "sync")]
+use embedded_hal::delay::DelayNs;
+#[cfg(feature = "sync")]
+use embedded_hal::i2c::I2c;
+#[cfg(feature = "sync")]
+use embedded_hal::spi::SpiDevice;
+
 use crate::interface::{I2cInterface, Interface, MprI2cError, MprSpiError, SpiInterface};
 use crate::{MprConfig, Reading};
 use crate::registers::Status;
@@ -39,12 +51,14 @@ impl <I: Interface>Mpr<I> {
     ///
     /// App should delay >=5ms or wait for rising edge on EOC line after this returns and before
     /// reading measurement data via any `read_raw*` method.
+    #[maybe_async::maybe_async]
     pub async fn exit_standby(&mut self) -> Result<(), I::Error> {
         self.interface.write_reg(&OUTPUT_MEASUREMENT_CMD).await
         // TODO should this return Status (first byte?) MISO on SPI, but a dedicated read on I2C...
     }
 
     /// Reads 24-bits of raw pressure data.
+    #[maybe_async::maybe_async]
     pub async fn read_raw(&mut self) -> Result<u32, I::Error> {
         let mut buf = [0u8; 4];
         self.interface.read_reg(&mut buf).await?;
@@ -55,6 +69,7 @@ impl <I: Interface>Mpr<I> {
     }
 
     /// Exits standby, waits and then reads raw pressure data.
+    #[maybe_async::maybe_async]
     pub async fn read_raw_with_delay<D: DelayNs>(&mut self, mut delay: D) -> Result<u32, I::Error> {
         self.exit_standby().await?;
         delay.delay_ms(EXIT_STANDBY_DELAY_MS).await;
@@ -62,6 +77,7 @@ impl <I: Interface>Mpr<I> {
     }
 
     /// Reads 24-bits of raw pressure data as a Reading.
+    #[maybe_async::maybe_async]
     pub async fn read(&mut self) -> Result<Reading, I::Error> {
         let raw_data = self.read_raw().await?;
         Ok(Reading {
@@ -73,6 +89,7 @@ impl <I: Interface>Mpr<I> {
     }
 
     /// Exits standby, waits and then reads raw pressure data as a Reading.
+    #[maybe_async::maybe_async]
     pub async fn read_with_delay<D: DelayNs>(&mut self, mut delay: D) -> Result<Reading, I::Error> {
         self.exit_standby().await?;
         delay.delay_ms(EXIT_STANDBY_DELAY_MS).await;
@@ -86,6 +103,7 @@ impl <I: Interface>Mpr<I> {
     }
 
     /// Reads the sensor status byte.
+    #[maybe_async::maybe_async]
     pub async fn status(&mut self) -> Result<Status, I::Error> {
         let mut buf = [0u8; 1];
         self.interface.read_reg(&mut buf).await?;

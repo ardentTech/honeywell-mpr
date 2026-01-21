@@ -1,0 +1,28 @@
+[package]
+name = "rp235x_blocking"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[dependencies]
+cortex-m = "0.7.7"
+cortex-m-rt = "0.7.5"
+critical-section = "1.2.0"
+defmt = "1.0.1"
+defmt-rtt = "1.0.0"
+embedded-hal = "1.0.0"
+honeywell_mpr = { path = "../../../", features = ["sync"] }
+panic-halt = "1.0.0"
+panic-probe = { version = "1.0.0", features = ["print-defmt"] }
+rp235x-hal = { version = "0.3.0", features = ["rt", "critical-section-impl", "defmt"] }
+
+[profile.release]
+# Enable generation of debug symbols even on release builds
+debug = true
+
+[[bin]]
+name = "i2c_status"
+path = "src/bin/i2c_status.rs"
+test = false
+doctest = false
+bench = false

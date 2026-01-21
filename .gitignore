@@ -1,3 +1,4 @@
 /target
 .idea
-/examples/rp235x/target
+/examples/rp235x/async/target
+/examples/rp235x/blocking/target

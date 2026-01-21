@@ -1,5 +1,4 @@
-//! This example shows how to read the sensor status using Embassy. Take note of the need to
-//! manually exit standby and then delay.
+//! This example shows how to read the sensor status using Embassy.
 
 #![no_std]
 #![no_main]
@@ -22,25 +21,13 @@ async fn main(_task_spawner: embassy_executor::Spawner) {
     config.frequency = 400_000;
     let bus = embassy_rp::i2c::I2c::new_async(p.I2C1, scl, sda, Irqs, config);
 
-    embassy_time::Timer::after(embassy_time::Duration::from_millis(100)).await;
     let config = MprConfig::new(0, 25, TransferFunction::C);
     let mut sensor = Mpr::new_i2c(bus, 0x18, config).unwrap();
 
     loop {
-        sensor.exit_standby().await.unwrap();
-        embassy_time::Timer::after(embassy_time::Duration::from_millis(10)).await;
-        match sensor.read().await {
-            Ok(reading) => {
-                info!(
-                    "bar: {}, inHg: {}, mmHg: {}, kPa: {}, psi: {}",
-                    reading.bar(),
-                    reading.inhg(),
-                    reading.mmhg(),
-                    reading.kpa(),
-                    reading.psi()
-                );
-            },
-            Err(_) => error!("read failed :(")
+        match sensor.status().await {
+            Ok(status) => info!("status: {:#x}", status.into_bits()),
+            Err(_) => error!("status failed :(")
         }
         embassy_time::Timer::after(embassy_time::Duration::from_millis(3_000)).await;
     }

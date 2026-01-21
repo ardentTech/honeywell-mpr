@@ -1,5 +1,11 @@
+#[cfg(not(feature = "sync"))]
 use embedded_hal_async::i2c::I2c;
+#[cfg(not(feature = "sync"))]
 use embedded_hal_async::spi::SpiDevice;
+#[cfg(feature = "sync")]
+use embedded_hal::i2c::I2c;
+#[cfg(feature = "sync")]
+use embedded_hal::spi::SpiDevice;
 use crate::registers::Status;
 
 #[derive(Debug)]
@@ -21,9 +27,12 @@ mod private {
     pub trait Sealed {}
 }
 
+#[maybe_async::maybe_async(AFIT)]
 pub trait Interface: private::Sealed {
     type Error;
+
     async fn read_reg(&mut self, buf: &mut [u8]) -> Result<(), Self::Error>;
+
     async fn write_reg(&mut self, buf: &[u8]) -> Result<(), Self::Error>;
     fn validate_status(&self, status: Status) -> Result<(), Self::Error>;
 }
@@ -43,10 +52,13 @@ impl<I2C: I2c> I2cInterface<I2C> {
 impl<I2C: I2c>private::Sealed for I2cInterface<I2C> {}
 impl<I2C: I2c>Interface for I2cInterface<I2C> {
     type Error = MprI2cError<I2C::Error>;
+
+    #[maybe_async::maybe_async]
     async fn read_reg(&mut self, buf: &mut [u8]) -> Result<(), MprI2cError<I2C::Error>> {
         self.device.read(self.address, buf).await.map_err(MprI2cError::I2c)
     }
 
+    #[maybe_async::maybe_async]
     async fn write_reg(&mut self, buf: &[u8]) -> Result<(), MprI2cError<I2C::Error>> {
         self.device.write(self.address, buf).await.map_err(MprI2cError::I2c)
     }
@@ -75,10 +87,13 @@ impl<SPI: SpiDevice> SpiInterface<SPI> {
 impl<SPI: SpiDevice>private::Sealed for SpiInterface<SPI> {}
 impl<SPI: SpiDevice>Interface for SpiInterface<SPI> {
     type Error = MprSpiError<SPI::Error>;
+
+    #[maybe_async::maybe_async]
     async fn read_reg(&mut self, buf: &mut [u8]) -> Result<(), MprSpiError<SPI::Error>> {
         self.device.read(buf).await.map_err(MprSpiError::Spi)
     }
 
+    #[maybe_async::maybe_async]
     async fn write_reg(&mut self, buf: &[u8]) -> Result<(), MprSpiError<SPI::Error>> {
         self.device.write(buf).await.map_err(MprSpiError::Spi)
     }

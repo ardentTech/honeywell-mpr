@@ -2,7 +2,9 @@
 `#![no_std]`, `async`-first driver for the Honeywell MPR pressure sensor built on top of
 Rust [embedded-hal](https://github.com/rust-embedded/embedded-hal).
 
-Chip variants (see datasheet Figure 4) differ between I2C and SPI as implementations of the serial interface.
+## Chip Variants
+See datasheet Figure 4 for a description of available chip variants. For implementing the correct driver, make note of
+the "Output Type" (I2C or SPI), the I2C address (if relevant), and the transfer function.
 
 ## I2C
 * Supports 100-400 kbit/s bus speeds
@@ -10,10 +12,14 @@ Chip variants (see datasheet Figure 4) differ between I2C and SPI as implementat
 
 ## SPI
 > [!IMPORTANT]
-> The SPI implementation and examples have NOT been verified or tested on hardware. If you have a chip variation that supports SPI and want to contribute, please document your setup in relevant examples, update code as needed and open a PR.
+> The SPI implementation has NOT been verified or tested on hardware, and that is why there are no examples. If you have
+> a chip variation that supports SPI and want to contribute, please document your setup in relevant examples, update
+> code as needed and open a PR.
 
-## Examples
-E.g. `$ cd examples/rp235x && cargo run --bin i2c_async_status`
+## TODO
+- [ ] maybe async
+- [ ] I2C blocking examples
+- [ ] pre-publish review
 
 ### Resources
 * [Datasheet](https://prod-edam.honeywell.com/content/dam/honeywell-edam/sps/siot/en-us/products/sensors/pressure-sensors/board-mount-pressure-sensors/micropressure-mpr-series/documents/sps-siot-mpr-series-datasheet-32332628-ciid-172626.pdf?download=false)

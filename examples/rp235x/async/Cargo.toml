@@ -1,5 +1,5 @@
 [package]
-name = "rp235x"
+name = "rp235x_async"
 version = "0.1.0"
 edition = "2024"
 publish = false
@@ -13,7 +13,7 @@ embassy-executor = { version = "0.9.0", features = ["arch-cortex-m", "executor-t
 embassy-rp = { version = "0.9.0", features = ["defmt", "unstable-pac", "time-driver", "critical-section-impl", "rp235xa", "binary-info"] }
 embassy-sync = "0.7.2"
 embassy-time = { version = "0.5.0", features = ["defmt", "defmt-timestamp-uptime"] }
-honeywell_mpr = { path = "../../" }
+honeywell_mpr = { path = "../../../" }
 panic-probe = { version = "1.0.0", features = ["print-defmt"] }
 
 [profile.release]
@@ -21,36 +21,36 @@ panic-probe = { version = "1.0.0", features = ["print-defmt"] }
 debug = true
 
 [[bin]]
-name = "i2c_async_status"
-path = "src/bin/i2c_async_status.rs"
+name = "i2c_status"
+path = "src/bin/i2c_status.rs"
 test = false
 doctest = false
 bench = false
 
 [[bin]]
-name = "i2c_async_raw_data"
-path = "src/bin/i2c_async_raw_data.rs"
+name = "i2c_raw_data"
+path = "src/bin/i2c_raw_data.rs"
 test = false
 doctest = false
 bench = false
 
 [[bin]]
-name = "i2c_async_raw_data_with_delay"
-path = "src/bin/i2c_async_raw_data_with_delay.rs"
+name = "i2c_raw_data_with_delay"
+path = "src/bin/i2c_raw_data_with_delay.rs"
 test = false
 doctest = false
 bench = false
 
 [[bin]]
-name = "i2c_async_read"
-path = "src/bin/i2c_async_read.rs"
+name = "i2c_read"
+path = "src/bin/i2c_read.rs"
 test = false
 doctest = false
 bench = false
 
 [[bin]]
-name = "i2c_async_read_with_delay"
-path = "src/bin/i2c_async_read_with_delay.rs"
+name = "i2c_read_with_delay"
+path = "src/bin/i2c_read_with_delay.rs"
 test = false
 doctest = false
 bench = false
