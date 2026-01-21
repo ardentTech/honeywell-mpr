@@ -81,8 +81,8 @@ impl <I: Interface>Mpr<I> {
     pub async fn read(&mut self) -> Result<Reading, I::Error> {
         let raw_data = self.read_raw().await?;
         Ok(Reading {
-            range_min: self.config.pressure_min as f32,
-            range_max: self.config.pressure_max as f32,
+            pressure_min: self.config.pressure_min as f32,
+            pressure_max: self.config.pressure_max as f32,
             raw_data,
             transfer_function: self.config.transfer_function
         })
@@ -95,8 +95,8 @@ impl <I: Interface>Mpr<I> {
         delay.delay_ms(EXIT_STANDBY_DELAY_MS).await;
         let raw_data = self.read_raw().await?;
         Ok(Reading {
-            range_min: self.config.pressure_min as f32,
-            range_max: self.config.pressure_max as f32,
+            pressure_min: self.config.pressure_min as f32,
+            pressure_max: self.config.pressure_max as f32,
             raw_data,
             transfer_function: self.config.transfer_function
         })

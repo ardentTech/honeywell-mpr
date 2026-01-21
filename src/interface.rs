@@ -8,7 +8,7 @@ use embedded_hal::i2c::I2c;
 use embedded_hal::spi::SpiDevice;
 use crate::registers::Status;
 
-#[derive(Debug)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum MprI2cError<E> {
     I2c(E),
     InvalidAddress,
@@ -16,7 +16,7 @@ pub enum MprI2cError<E> {
     MathSaturation,
 }
 
-#[derive(Debug)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum MprSpiError<E> {
     IntegrityTest,
     MathSaturation,

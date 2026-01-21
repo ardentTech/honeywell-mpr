@@ -3,6 +3,8 @@ const INHG_PER_PSI: f32 = 2.03602;
 const MMHG_PER_PSI: f32 = 51.71492;
 const PSI_PER_BAR: f32 = 14.50377;
 
+/// Configures the driver for a specific pressure range and transfer function.
+/// See datasheet Figure 4 Pressure Range, Unit and Reference, and Figure 4 Output Type.
 #[derive(Debug)]
 pub struct MprConfig {
     pub(crate) pressure_min: u8,
@@ -19,16 +21,16 @@ impl MprConfig {
     }
 }
 
-/// Wraps raw measurement data for easy unit conversions.
+/// Associates raw data with a pressure range and transfer function for easy unit conversions.
 pub struct Reading {
-    pub(crate) range_min: f32,
-    pub(crate) range_max: f32,
+    pub pressure_min: f32,
+    pub pressure_max: f32,
     pub raw_data: u32,
-    pub(crate) transfer_function: TransferFunction
+    pub transfer_function: TransferFunction
 }
 impl Reading {
     pub fn new(range_min: f32, range_max: f32, raw_data: u32, transfer_function: TransferFunction) -> Self {
-        Self { range_min, range_max, raw_data, transfer_function }
+        Self { pressure_min: range_min, pressure_max: range_max, raw_data, transfer_function }
     }
 
     /// Converts raw measurement data to bar.
@@ -49,12 +51,12 @@ impl Reading {
 
     /// Converts raw measurement data to PSI.
     pub fn psi(&self) -> f32 {
-        ((self.raw_data as f32 - self.transfer_function.min_counts()) * (self.range_max - self.range_min)) /
-            (self.transfer_function.max_counts() - self.transfer_function.min_counts()) + self.range_min
+        ((self.raw_data as f32 - self.transfer_function.min_counts()) * (self.pressure_max - self.pressure_min)) /
+            (self.transfer_function.max_counts() - self.transfer_function.min_counts()) + self.pressure_min
     }
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum TransferFunction {
     /// 10% to 90% of 2**24 counts
     A,
@@ -66,7 +68,7 @@ pub enum TransferFunction {
 impl TransferFunction {
     pub fn min_counts(&self) -> f32 {
         match self {
-            // precomputed percentages
+            // precomputed percentages of 2**24
             TransferFunction::A => 1677721.6,
             TransferFunction::B => 419430.4,
             TransferFunction::C => 3355443.3,
@@ -74,7 +76,7 @@ impl TransferFunction {
     }
     pub fn max_counts(&self) -> f32 {
         match self {
-            // precomputed percentages
+            // precomputed percentages of 2**24
             TransferFunction::A => 15099494.0,
             TransferFunction::B => 3774873.5,
             TransferFunction::C => 13421773.0,
