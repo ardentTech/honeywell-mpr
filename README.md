@@ -12,11 +12,31 @@ the "Output Type" (I2C or SPI), the I2C address (if relevant), and the transfer 
 * [Async Examples](https://github.com/ardentTech/honeywell-mpr/examples/rp235x_async)
 * [Blocking Examples](https://github.com/ardentTech/honeywell-mpr/examples/rp235x_blocking)
 
+```rust
+// i2c
+let mut config = embassy_rp::i2c::Config::default();
+config.frequency = 400_000;
+let bus = embassy_rp::i2c::I2c::new_async(p.I2C1, p.PIN_15, p.PIN_14, Irqs, config);
+// driver
+let config = MprConfig::new(0, 25, TransferFunction::C);
+let mut sensor = Mpr::new_i2c(bus, 0x18, config).unwrap();
+match sensor.read_with_delay(Delay).await { ... }
+```
+
 ## SPI
 > [!WARNING]
 > The SPI implementation has NOT been verified or tested on hardware, and that is why there are no examples. If you have
 > a SPI-based chip variation and want to contribute, please document your setup in relevant examples, update code as
 > needed and open a PR.
+
+```rust
+// spi
+let mut spi = Spi::new(p.SPI1, p.PIN_10, p.PIN_11, p.PIN_12, p.DMA_CH0, p.DMA_CH1, Config::default());
+// driver
+let config = MprConfig::new(0, 30, TransferFunction::A);
+let mut sensor = Mpr::new_spi(bus, config).unwrap();
+match sensor.read_raw().await { ... }
+```
 
 ### Resources
 * [Datasheet](https://prod-edam.honeywell.com/content/dam/honeywell-edam/sps/siot/en-us/products/sensors/pressure-sensors/board-mount-pressure-sensors/micropressure-mpr-series/documents/sps-siot-mpr-series-datasheet-32332628-ciid-172626.pdf?download=false)
