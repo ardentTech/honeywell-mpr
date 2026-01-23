@@ -1,11 +1,12 @@
-//! This example shows how to read raw data using Embassy. Take note of the need to manually exit
-//! standby and then delay.
+//! This example shows how to read raw sensor data using Embassy by letting the driver handle
+//! exiting standby and waiting.
 
 #![no_std]
 #![no_main]
 
 use defmt::*;
 use embassy_rp::i2c::InterruptHandler;
+use embassy_time::Delay;
 use {defmt_rtt as _, panic_probe as _};
 use honeywell_mpr::{Mpr, MprConfig, TransferFunction};
 
@@ -26,11 +27,9 @@ async fn main(_task_spawner: embassy_executor::Spawner) {
     let mut sensor = Mpr::new_i2c(bus, 0x18, config).unwrap();
 
     loop {
-        sensor.exit_standby().await.unwrap();
-        embassy_time::Timer::after(embassy_time::Duration::from_millis(10)).await;
-        match sensor.read_raw().await {
+        match sensor.read_raw_with_delay(Delay).await {
             Ok(raw_data) => info!("raw data: {}", raw_data),
-            Err(_) => error!("read_raw failed :(")
+            Err(_) => error!("read_raw_with_delay failed :(")
         }
         embassy_time::Timer::after(embassy_time::Duration::from_millis(3_000)).await;
     }

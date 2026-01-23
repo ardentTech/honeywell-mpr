@@ -28,20 +28,6 @@ doctest = false
 bench = false
 
 [[bin]]
-name = "i2c_raw_data"
-path = "src/bin/i2c_raw_data.rs"
-test = false
-doctest = false
-bench = false
-
-[[bin]]
-name = "i2c_raw_data_with_delay"
-path = "src/bin/i2c_raw_data_with_delay.rs"
-test = false
-doctest = false
-bench = false
-
-[[bin]]
 name = "i2c_read"
 path = "src/bin/i2c_read.rs"
 test = false
@@ -49,8 +35,36 @@ doctest = false
 bench = false
 
 [[bin]]
-name = "i2c_read_with_delay"
-path = "src/bin/i2c_read_with_delay.rs"
+name = "i2c_read_delay"
+path = "src/bin/i2c_read_delay.rs"
+test = false
+doctest = false
+bench = false
+
+[[bin]]
+name = "i2c_read_eoc"
+path = "src/bin/i2c_read_eoc.rs"
+test = false
+doctest = false
+bench = false
+
+[[bin]]
+name = "i2c_read_raw"
+path = "src/bin/i2c_read_raw.rs"
+test = false
+doctest = false
+bench = false
+
+[[bin]]
+name = "i2c_read_raw_delay"
+path = "src/bin/i2c_read_raw_delay.rs"
+test = false
+doctest = false
+bench = false
+
+[[bin]]
+name = "i2c_read_raw_eoc"
+path = "src/bin/i2c_read_raw_eoc.rs"
 test = false
 doctest = false
 bench = false

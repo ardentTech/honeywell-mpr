@@ -1,12 +1,12 @@
-//! This example shows how to read the sensor status using Embassy. Unlike the `i2c_async_read`
-//! example, standby does not need to be exited manually and the wait is handled by the driver.
+//! This example shows how to read raw sensor data using Embassy. Instead of waiting, it uses the
+//! EOC pin to check for a pulse to know when data is ready.
 
 #![no_std]
 #![no_main]
 
 use defmt::*;
+use embassy_rp::gpio::{Input, Pull};
 use embassy_rp::i2c::InterruptHandler;
-use embassy_time::Delay;
 use {defmt_rtt as _, panic_probe as _};
 use honeywell_mpr::{Mpr, MprConfig, TransferFunction};
 
@@ -17,6 +17,7 @@ embassy_rp::bind_interrupts!(struct Irqs {
 #[embassy_executor::main]
 async fn main(_task_spawner: embassy_executor::Spawner) {
     let p = embassy_rp::init(Default::default());
+    let mut eoc = Input::new(p.PIN_13, Pull::Down);
     let sda = p.PIN_14;
     let scl = p.PIN_15;
     let mut config = embassy_rp::i2c::Config::default();
@@ -27,17 +28,10 @@ async fn main(_task_spawner: embassy_executor::Spawner) {
     let mut sensor = Mpr::new_i2c(bus, 0x18, config).unwrap();
 
     loop {
-        match sensor.read_with_delay(Delay).await {
-            Ok(reading) => {
-                info!(
-                    "bar: {}, inHg: {}, mmHg: {}, kPa: {}, psi: {}",
-                    reading.bar(),
-                    reading.inhg(),
-                    reading.mmhg(),
-                    reading.kpa(),
-                    reading.psi()
-                );
-            },
+        sensor.exit_standby().await.unwrap();
+        eoc.wait_for_high().await;
+        match sensor.read_raw().await {
+            Ok(raw_data) => info!("raw data: {}", raw_data),
             Err(_) => error!("read failed :(")
         }
         embassy_time::Timer::after(embassy_time::Duration::from_millis(3_000)).await;

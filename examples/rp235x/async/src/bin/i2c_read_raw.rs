@@ -1,5 +1,5 @@
-//! This example shows how to read sensor data using Embassy. Take note of the need to
-//! manually exit standby and then delay.
+//! This example shows how to read raw sensor data using Embassy. Take note of the need to manually
+//! exit standby and then wait.
 
 #![no_std]
 #![no_main]
@@ -28,18 +28,9 @@ async fn main(_task_spawner: embassy_executor::Spawner) {
     loop {
         sensor.exit_standby().await.unwrap();
         embassy_time::Timer::after(embassy_time::Duration::from_millis(10)).await;
-        match sensor.read().await {
-            Ok(reading) => {
-                info!(
-                    "bar: {}, inHg: {}, mmHg: {}, kPa: {}, psi: {}",
-                    reading.bar(),
-                    reading.inhg(),
-                    reading.mmhg(),
-                    reading.kpa(),
-                    reading.psi()
-                );
-            },
-            Err(_) => error!("read failed :(")
+        match sensor.read_raw().await {
+            Ok(raw_data) => info!("raw data: {}", raw_data),
+            Err(_) => error!("read_raw failed :(")
         }
         embassy_time::Timer::after(embassy_time::Duration::from_millis(3_000)).await;
     }

@@ -17,6 +17,7 @@ use crate::interface::{I2cInterface, Interface, MprI2cError, MprSpiError, SpiInt
 use crate::{MprConfig, Reading};
 use crate::registers::Status;
 
+// TODO change to EXIT_STANDBY_MIN_DELAY_MS: u32 = 5;
 const EXIT_STANDBY_DELAY_MS: u32 = 10;
 const OUTPUT_MEASUREMENT_CMD: [u8; 3] = [0xaa, 0x00, 0x00];
 const VALID_I2C_ADDRESSES: [u8; 8] = [0x08, 0x18, 0x28, 0x38, 0x48, 0x58, 0x68, 0x78];
