@@ -1,6 +1,5 @@
-//! This example shows how to read sensor data using Embassy. Unlike the `i2c_async_read` example,
-//! standby does not need to be exited manually and the wait is handled by the driver.
-
+//! This example shows how to read sensor data using Embassy. By passing in a DelayNs concretion,
+//! the app doesn't need to worry about exiting standby or waiting before reading measurement data.
 #![no_std]
 #![no_main]
 

@@ -530,6 +530,8 @@ dependencies = [
 name = "rp235x_blocking"
 version = "0.1.0"
 dependencies = [
+ "cortex-m",
+ "critical-section",
  "defmt 1.0.1",
  "defmt-rtt",
  "embedded-hal 1.0.0",

@@ -1,6 +1,5 @@
-//! This example shows how to read sensor data using Embassy. Take note of the need to
-//! manually exit standby and then delay.
-
+//! This example shows how to read sensor data using Embassy. After exiting standby, the app  waits
+//! 10ms before reading measurement data.
 #![no_std]
 #![no_main]
 

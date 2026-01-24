@@ -5,12 +5,14 @@ edition = "2024"
 publish = false
 
 [dependencies]
+cortex-m = "0.7.7"
 defmt = "1.0.1"
 defmt-rtt = "1.0.0"
 embedded-hal = "1.0.0"
 honeywell_mpr = { path = "../../../", features = ["sync"] }
 panic-halt = "1.0.0"
 rp235x-hal = { version = "0.3.0", features = ["rt", "critical-section-impl", "defmt"] }
+critical-section = "1.2.0"
 
 [profile.release]
 # Enable generation of debug symbols even on release builds
@@ -24,20 +26,6 @@ doctest = false
 bench = false
 
 [[bin]]
-name = "i2c_raw_data"
-path = "src/bin/i2c_raw_data.rs"
-test = false
-doctest = false
-bench = false
-
-[[bin]]
-name = "i2c_raw_data_with_delay"
-path = "src/bin/i2c_raw_data_with_delay.rs"
-test = false
-doctest = false
-bench = false
-
-[[bin]]
 name = "i2c_read"
 path = "src/bin/i2c_read.rs"
 test = false
@@ -45,8 +33,36 @@ doctest = false
 bench = false
 
 [[bin]]
-name = "i2c_read_with_delay"
-path = "src/bin/i2c_read_with_delay.rs"
+name = "i2c_read_delay"
+path = "src/bin/i2c_read_delay.rs"
+test = false
+doctest = false
+bench = false
+
+[[bin]]
+name = "i2c_read_eoc"
+path = "src/bin/i2c_read_eoc.rs"
+test = false
+doctest = false
+bench = false
+
+[[bin]]
+name = "i2c_read_raw"
+path = "src/bin/i2c_read_raw.rs"
+test = false
+doctest = false
+bench = false
+
+[[bin]]
+name = "i2c_read_raw_delay"
+path = "src/bin/i2c_read_raw_delay.rs"
+test = false
+doctest = false
+bench = false
+
+[[bin]]
+name = "i2c_read_raw_eoc"
+path = "src/bin/i2c_read_raw_eoc.rs"
 test = false
 doctest = false
 bench = false

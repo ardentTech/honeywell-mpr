@@ -1,3 +1,5 @@
+//! This example shows how to read raw sensor data using the rp235x-hal. After exiting standby, the
+//! app waits 10ms before reading measurement data.
 #![no_std]
 #![no_main]
 

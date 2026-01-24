@@ -1,6 +1,5 @@
-//! This example shows how to read sensor data using Embassy. Instead of waiting, it uses the EOC
-//! pin to check for a pulse to know when data is ready.
-
+//! This example shows how to read sensor data using Embassy. Instead of waiting, an ISR runs when
+//! the EOC pin goes high, which indicates that measurement data is ready.
 #![no_std]
 #![no_main]
 

@@ -1,6 +1,6 @@
-//! This example shows how to read raw sensor data using Embassy by letting the driver handle
-//! exiting standby and waiting.
-
+//! This example shows how to read raw sensor data using Embassy. By passing in a DelayNs
+//! concretion, the app doesn't need to worry about exiting standby or waiting before reading
+//! measurement data.
 #![no_std]
 #![no_main]
 

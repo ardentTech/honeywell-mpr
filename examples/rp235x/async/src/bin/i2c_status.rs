@@ -1,4 +1,4 @@
-//! This example shows how to read the sensor status using Embassy.
+//! This example shows how to read the MPR status byte using the rp235x-hal.
 
 #![no_std]
 #![no_main]
