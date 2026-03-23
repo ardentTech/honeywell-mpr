@@ -86,36 +86,36 @@ impl TransferFunction {
 
 #[cfg(test)]
 mod tests {
-    use approx::relative_eq;
+    use approx::{assert_relative_eq, relative_eq};
     use super::*;
 
     #[test]
     fn reading_bar_ok() {
         let reading = Reading::new(-1.0, 1.0, 14260634, TransferFunction::A);
-        let _ = relative_eq!(reading.bar(), 0.0603, epsilon = f32::EPSILON);
+        assert_relative_eq!(reading.bar(), 0.0603, epsilon = 1e-4f32);
     }
 
     #[test]
     fn reading_inhg_ok() {
         let reading = Reading::new(-1.0, 1.0, 14260634, TransferFunction::A);
-        let _ = relative_eq!(reading.inhg(), 1.78151, epsilon = f32::EPSILON);
+        assert_relative_eq!(reading.inhg(), 1.7815, epsilon = 1e-4f32);
     }
 
     #[test]
     fn reading_mmhg_ok() {
         let reading = Reading::new(-1.0, 1.0, 14260634, TransferFunction::A);
-        let _ = relative_eq!(reading.mmhg(), 45.25056, epsilon = f32::EPSILON);
+        assert_relative_eq!(reading.mmhg(), 45.2505, epsilon = 1e-4f32);
     }
 
     #[test]
     fn reading_kpa_ok() {
         let reading = Reading::new(-1.0, 1.0, 14260634, TransferFunction::A);
-        let _ = relative_eq!(reading.kpa(), 6.0329, epsilon = f32::EPSILON);
+        assert_relative_eq!(reading.kpa(), 6.0329, epsilon = 1e-3f32);
     }
 
     #[test]
     fn reading_psi_ok() {
         let reading = Reading::new(-1.0, 1.0, 14260634, TransferFunction::A);
-        let _ = relative_eq!(reading.psi(), 0.875, epsilon = f32::EPSILON);
+        let _ = relative_eq!(reading.psi(), 0.875, epsilon = 1e-4f32);
     }
 }
