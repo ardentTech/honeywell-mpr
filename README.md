@@ -10,7 +10,7 @@ the "Output Type" (I2C or SPI), the I2C address (if relevant), and the transfer 
 * Supports 100-400 kbit/s bus speeds
 * 7-bit device address (see datasheet Figure 4 Output Type)
 * [Async Examples](https://github.com/ardentTech/honeywell-mpr/examples/rp235x_async)
-* [Blocking Examples](https://github.com/ardentTech/honeywell-mpr/examples/rp235x_blocking)
+* [Blocking Examples](https://github.com/ardentTech/honeywell-mpr/examples/rp235x_sync)
 
 ```rust
 // i2c
